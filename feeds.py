@@ -59,11 +59,61 @@ def fetch(data):
                 prices.extend(rows)
             except Exception as e: issues.append((sid,'Alpaca SIP',type(e).__name__))
     if not prices: raise RuntimeError('No actual market prices retrieved. Check network/provider access; no mock fallback.')
-    asof=max(d for _,d,_,_ in prices); positions=[]
-    with (data/'holdings_input.csv').open(newline='',encoding='utf-8-sig') as f:
-        for r in csv.DictReader(f):
-            q=float(r['quantity']); sid=r['security_id'].strip().upper()
-            if not math.isfinite(q) or q<0 or sid not in SYMBOLS: raise ValueError('Holdings must contain supported tickers and finite nonnegative quantities')
-            positions.append((r['portfolio'],sid,asof,q))
+# Determine the latest available market data date
+asof = max(d for _, d, _, _ in prices)
+
+# Initialise portfolio positions
+positions = []
+
+# Portfolio holdings are optional
+holdings_file = data / "holdings_input.csv"
+
+if holdings_file.is_file():
+
+    with holdings_file.open(
+        newline="",
+        encoding="utf-8-sig"
+    ) as f:
+
+        reader = csv.DictReader(f)
+
+        required_columns = {
+            "portfolio",
+            "security_id",
+            "quantity"
+        }
+
+        if not required_columns.issubset(reader.fieldnames or []):
+            raise ValueError(
+                "Holdings CSV must contain: "
+                "portfolio, security_id, quantity"
+            )
+
+        for r in reader:
+
+            portfolio = r["portfolio"].strip()
+            sid = r["security_id"].strip().upper()
+            q = float(r["quantity"])
+
+            if (
+                not portfolio
+                or not math.isfinite(q)
+                or q < 0
+                or sid not in SYMBOLS
+            ):
+                raise ValueError(
+                    "Invalid holding: check portfolio, "
+                    "security ID and quantity."
+                )
+
+            positions.append(
+                (portfolio, sid, asof, q)
+            )
+
+else:
+    print(
+        "No holdings_input.csv found. "
+        "Continuing without portfolio positions."
+    )
     (raw/'manifest.json').write_text(json.dumps({'retrieved_utc':datetime.now(timezone.utc).isoformat(),'sources':{'Vendor A':'Yahoo Finance via yfinance','Vendor B':'Alpha Vantage (optional)','Vendor C':'Twelve Data','Vendor D':'Alpaca SIP'},'alpha_enabled':bool(key),'twelve_enabled':bool(twelve),'alpaca_enabled':bool(alpaca and secret),'issues':issues,'valuation_date':asof},indent=2))
     return date.fromisoformat(asof),securities,prices,positions,actions,issues
