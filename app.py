@@ -22,7 +22,6 @@ st.set_page_config(
 # foreground when Streamlit Cloud or an existing theme uses a light sidebar.
 st.markdown('''
 <style>
-:root { color-scheme: light; }
 [data-testid="stSidebar"],
 [data-testid="stSidebar"] > div {
     background-color: #EAF1F7 !important;
@@ -71,11 +70,44 @@ st.markdown('''
     color: #172B4D !important;
     -webkit-text-fill-color: #172B4D !important;
 }
+/* Global metric-card contrast — applies to every page and imported page. */
 [data-testid="stMetric"] {
-    border: 1px solid #D8E1EB;
-    border-radius: 12px;
-    padding: 16px;
-    background: #FFFFFF;
+    background-color: #FFFFFF !important;
+    border: 1px solid #D8E1EB !important;
+    border-radius: 12px !important;
+    padding: 16px !important;
+    min-height: 125px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+}
+/* Streamlit's dark theme otherwise renders near-white text on white cards. */
+[data-testid="stMetric"] [data-testid="stMetricLabel"],
+[data-testid="stMetric"] [data-testid="stMetricLabel"] *,
+[data-testid="stMetric"] [data-testid="stMetricValue"],
+[data-testid="stMetric"] [data-testid="stMetricValue"] *,
+[data-testid="stMetric"] label,
+[data-testid="stMetric"] label *,
+[data-testid="stMetric"] div[data-testid="stMetricValue"],
+[data-testid="stMetric"] div[data-testid="stMetricLabel"] {
+    color: #172B4D !important;
+    -webkit-text-fill-color: #172B4D !important;
+    opacity: 1 !important;
+}
+[data-testid="stMetric"] [data-testid="stMetricLabel"],
+[data-testid="stMetric"] [data-testid="stMetricLabel"] * {
+    color: #52647A !important;
+    -webkit-text-fill-color: #52647A !important;
+}
+/* Keep metric deltas readable and retain positive/negative meaning. */
+[data-testid="stMetric"] [data-testid="stMetricDelta"] {
+    color: #176D61 !important;
+    -webkit-text-fill-color: #176D61 !important;
+}
+[data-testid="stMetric"] [data-testid="stMetricDelta"] * {
+    color: inherit !important;
+    -webkit-text-fill-color: currentColor !important;
+}
+[data-testid="stMetric"] [data-testid="stMetricDelta"][data-testid*="inverse"] {
+    color: #A83232 !important;
 }
 .block-container { padding-top: 2rem; max-width: 1500px; }
 h1, h2, h3 { letter-spacing: -0.025em; }
