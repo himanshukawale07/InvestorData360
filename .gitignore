@@ -1,0 +1,27 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# Secrets and credentials
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+credentials.toml
+*.pem
+*.key
+
+# Development files
+.vscode/
+.idea/
+.pytest_cache/
+.mypy_cache/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
